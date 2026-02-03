@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+supabase
+python-dotenv
+google-generativeai
+pydantic
+pydantic-settings
+apscheduler
+httpx
