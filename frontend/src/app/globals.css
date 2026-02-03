@@ -1,0 +1,171 @@
+@import "tailwindcss";
+
+@layer base {
+    :root {
+        /* Tech-Elegant Palette - Harmonious & Modern */
+        --bronze: #9E7D45;
+        /* Balanced Bronze, not too heavy */
+        --bronze-soft: #D4AF37;
+        /* Metallic for highlights */
+        --espresso: #2D241A;
+        /* Soft coffee black for text */
+        --cream: #EDE3D3;
+        /* Warm neutral separator */
+        --silk: #F9F7F4;
+        /* Soft silk background */
+        --item-bg: #FFFFFF;
+        /* Pure white for foreground elements */
+
+        /* App UI Colors */
+        --background: var(--silk);
+        --foreground: var(--espresso);
+        --muted: #9E9386;
+        /* Softer muted tone */
+        --accent-glow: rgba(158, 125, 69, 0.05);
+
+        /* Depth & Modernity */
+        --glass-bg: rgba(255, 255, 255, 0.8);
+        --glass-border: rgba(158, 125, 69, 0.08);
+        /* Minimalist borders */
+        --shadow-premium: 0 20px 50px -12px rgba(45, 36, 26, 0.08);
+        --radius: 1.25rem;
+
+        /* Typography Slots */
+        --font-modern: var(--font-outfit), 'Inter', sans-serif;
+        --font-data: var(--font-inter), sans-serif;
+        --font-serif: var(--font-lora), serif;
+    }
+
+    body {
+        background-color: var(--background);
+        color: var(--foreground);
+        font-family: var(--font-data);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    .modern-heading {
+        font-family: var(--font-modern);
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        color: var(--espresso);
+    }
+
+    .clinical-serif {
+        font-family: var(--font-serif);
+        font-style: italic;
+    }
+}
+
+@theme {
+    --color-bronze: #9E7D45;
+    --color-espresso: #2D241A;
+    --color-cream: #EDE3D3;
+}
+
+@layer components {
+    .glass-card {
+        background-color: var(--item-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-premium);
+        backdrop-filter: blur(20px);
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .glass-card:hover {
+        border-color: rgba(158, 125, 69, 0.15);
+    }
+
+    .premium-button {
+        padding: 0.8rem 1.8rem;
+        border-radius: 1rem;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        font-size: 0.85rem;
+        transition: all 0.3s var(--ease-out-expo);
+        font-family: var(--font-modern);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+    }
+
+    .premium-button-primary {
+        background: linear-gradient(135deg, var(--bronze), #B8860B);
+        color: white;
+        box-shadow: 0 8px 20px -6px rgba(158, 125, 69, 0.35);
+    }
+
+    .premium-button-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 25px -8px rgba(158, 125, 69, 0.45);
+    }
+
+    .premium-button-secondary {
+        background-color: var(--item-bg);
+        color: var(--bronze);
+        border: 1px solid var(--glass-border);
+    }
+
+    .premium-button-secondary:hover {
+        background-color: var(--silk);
+        border-color: var(--bronze);
+    }
+
+    .input-field {
+        width: 100%;
+        padding: 0.85rem 1.25rem;
+        border-radius: 1rem;
+        border: 1px solid var(--cream);
+        background-color: var(--item-bg);
+        font-family: var(--font-data);
+        transition: all 0.3s var(--ease-out-expo);
+        font-size: 0.9rem;
+        color: var(--espresso);
+    }
+
+    .input-field:focus {
+        border-color: var(--bronze);
+        box-shadow: 0 0 0 4px var(--accent-glow);
+        outline: none;
+    }
+}
+
+:root {
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.8s var(--ease-out-expo) forwards;
+}
+
+.animate-slide-up {
+    animation: slideUp 0.4s var(--ease-out-expo) forwards;
+}
