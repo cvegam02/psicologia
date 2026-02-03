@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Calendar as CalendarIcon, Clock, User, AlertCircle } from 'lucide-react';
+import { X, Calendar as CalendarIcon, Clock, User, AlertCircle, CheckCircle2, UserCheck, UserMinus, XCircle, RotateCcw, Activity } from 'lucide-react';
 import { usePatients } from '@/features/patients/hooks/usePatients';
 import { agendaApi } from '../api';
 import { supabase } from '@/lib/supabase';
@@ -10,7 +10,7 @@ import PremiumDatePicker from '@/components/ui/PremiumDatePicker';
 import PremiumSelect from '@/components/ui/PremiumSelect';
 import TimeSlotPicker from './TimeSlotPicker';
 import { useAvailability } from '../hooks/useAvailability';
-import type { Appointment } from '../types';
+import type { Appointment, AppointmentStatus } from '../types';
 
 interface EditAppointmentModalProps {
     appointment: Appointment;
@@ -31,23 +31,21 @@ export default function EditAppointmentModal({
         return () => setMounted(false);
     }, []);
 
-    // Initial values from appointment
-    const initialDate = new Date(appointment.scheduled_at).toISOString().split('T')[0];
-    const initialTime = new Date(appointment.scheduled_at).toLocaleTimeString('es-MX', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-    }).slice(0, 5);
+    // Initial values from appointment - Extract LOCAL date and time
+    const sched = new Date(appointment.scheduled_at);
+    const initialDate = `${sched.getFullYear()}-${String(sched.getMonth() + 1).padStart(2, '0')}-${String(sched.getDate()).padStart(2, '0')}`;
+    const initialTime = `${String(sched.getHours()).padStart(2, '0')}:${String(sched.getMinutes()).padStart(2, '0')}`;
 
     const [selectedPatient, setSelectedPatient] = useState(appointment.patient_id);
     const [date, setDate] = useState(initialDate);
     const [time, setTime] = useState(initialTime);
     const [duration, setDuration] = useState(appointment.duration || 60);
+    const [status, setStatus] = useState<AppointmentStatus>(appointment.status);
     const [notes, setNotes] = useState(appointment.notes || '');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const { slots, loading: loadingAvailability } = useAvailability(date);
+    const { slots, loading: loadingAvailability } = useAvailability(date, appointment.psychologist_id);
 
     const patientOptions = patients.map(p => ({
         id: p.id,
@@ -55,6 +53,15 @@ export default function EditAppointmentModal({
         description: p.phone || 'Sin teléfono',
         icon: <User size={18} />
     }));
+
+    const statusOptions = [
+        { id: 'scheduled', label: 'Agendada', description: 'Cita programada pendiente de confirmación', icon: <CalendarIcon size={18} className="text-zinc-500" /> },
+        { id: 'confirmed', label: 'Confirmada', description: 'El paciente ha confirmado su asistencia', icon: <CheckCircle2 size={18} className="text-sky-500" /> },
+        { id: 'attended', label: 'Atendida', description: 'La sesión se realizó con éxito', icon: <UserCheck size={18} className="text-emerald-500" /> },
+        { id: 'no_show', label: 'No asistió', description: 'El paciente no llegó a la cita', icon: <UserMinus size={18} className="text-amber-500" /> },
+        { id: 'cancelled', label: 'Cancelada', description: 'La cita fue anulada', icon: <XCircle size={18} className="text-rose-500" /> },
+        { id: 'rescheduled', label: 'Reagendada', description: 'La cita se movió a otra fecha', icon: <RotateCcw size={18} className="text-zinc-600" /> },
+    ];
 
     const isTodayOrTomorrow = (dateStr: string) => {
         const d = new Date(`${dateStr}T00:00:00`);
@@ -73,24 +80,32 @@ export default function EditAppointmentModal({
         setLoading(true);
 
         try {
-            // Check if status needs to revert to 'scheduled'
-            // If it was confirmed and new date is NOT today or tomorrow
-            let newStatus = appointment.status;
-            if (appointment.status === 'confirmed' && !isTodayOrTomorrow(date)) {
-                newStatus = 'scheduled';
+            const [y, m, d] = date.split('-').map(Number);
+            const [h, min_val] = time.split(':').map(Number);
+            const scheduledAtDate = new Date(y, m - 1, d, h, min_val);
+
+            // Final validation for past dates/times
+            if (scheduledAtDate < new Date()) {
+                throw new Error('No se pueden agendar citas en el pasado');
             }
 
-            const scheduledAt = new Date(`${date}T${time}`).toISOString();
+            // Logic for auto-reverting status if date changes significantly
+            let finalStatus = status;
+            const dateChanged = date !== initialDate;
+
+            if (dateChanged && status === 'confirmed' && !isTodayOrTomorrow(date)) {
+                finalStatus = 'scheduled';
+            }
+
+            const scheduledAt = scheduledAtDate.toISOString();
 
             await agendaApi.update(appointment.id, {
                 patient_id: selectedPatient,
                 scheduled_at: scheduledAt,
                 duration,
                 notes,
-                // We cast to any because AppointmentCreate might not have status, 
-                // but the update method supports partial Appointment fields
-                status: newStatus
-            } as any);
+                status: finalStatus
+            });
 
             onSuccess();
         } catch (err) {
@@ -138,6 +153,16 @@ export default function EditAppointmentModal({
                             required
                         />
 
+                        <PremiumSelect
+                            label="Estado de la Cita"
+                            placeholder="Cambiar estado..."
+                            options={statusOptions}
+                            value={status}
+                            onChange={(val) => setStatus(val as AppointmentStatus)}
+                            icon={<Activity size={14} />}
+                            required
+                        />
+
                         <div className="space-y-4">
                             <PremiumDatePicker
                                 value={date}
@@ -147,6 +172,7 @@ export default function EditAppointmentModal({
                                 }}
                                 label="Modificar Fecha"
                                 required
+                                minDate={new Date()}
                             />
 
                             {date ? (
@@ -184,6 +210,7 @@ export default function EditAppointmentModal({
                                             selectedTime={time}
                                             onSelect={setTime}
                                             loading={loadingAvailability}
+                                            selectedDate={date}
                                         />
                                     </div>
                                 </div>

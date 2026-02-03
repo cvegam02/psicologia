@@ -14,13 +14,15 @@ interface TimeSlotPickerProps {
     selectedTime: string;
     onSelect: (time: string) => void;
     loading?: boolean;
+    selectedDate?: string; // YYYY-MM-DD
 }
 
 export default function TimeSlotPicker({
     slots,
     selectedTime,
     onSelect,
-    loading = false
+    loading = false,
+    selectedDate
 }: TimeSlotPickerProps) {
     if (loading) {
         return (
@@ -41,20 +43,47 @@ export default function TimeSlotPicker({
         );
     }
 
+    const isPastTime = (slotTime: string) => {
+        if (!selectedDate) return false;
+
+        const now = new Date();
+        // Construct LOCAL YYYY-MM-DD string
+        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+        // If selected date is strictly after today, it's never "past"
+        if (selectedDate > todayStr) return false;
+
+        // If it's a past day (blocked by calendar normally), everything is "past"
+        if (selectedDate < todayStr) return true;
+
+        // If it's exactly Today, compare hours and minutes
+        const [hours, minutes] = slotTime.split(':').map(Number);
+        const slotDate = new Date();
+        slotDate.setHours(hours, minutes, 0, 0);
+
+        return slotDate < now;
+    };
+
     return (
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
             {slots.map((slot) => {
                 const isSelected = selectedTime === slot.time;
+                const isPast = isPastTime(slot.time);
+                const isOccupied = !slot.isAvailable;
+                const disabled = isOccupied || isPast;
+
                 return (
                     <button
                         key={slot.time}
                         type="button"
-                        disabled={!slot.isAvailable}
+                        disabled={disabled}
                         onClick={() => onSelect(slot.time)}
                         className={`
                             relative h-14 flex flex-col items-center justify-center rounded-xl transition-all border group
-                            ${!slot.isAvailable
-                                ? 'bg-rose-50/50 border-rose-100 text-rose-300 cursor-not-allowed grayscale'
+                            ${disabled
+                                ? isPast
+                                    ? 'bg-zinc-50 border-zinc-100 text-zinc-300 cursor-not-allowed'
+                                    : 'bg-rose-50/50 border-rose-100 text-rose-300 cursor-not-allowed grayscale'
                                 : isSelected
                                     ? 'bg-[var(--bronze)] border-[var(--bronze)] text-white shadow-lg shadow-[var(--bronze)]/20 scale-105 z-10'
                                     : 'bg-white border-black/5 text-[var(--espresso)] hover:border-[var(--bronze)]/50 hover:bg-[var(--silk)] active:scale-95'
@@ -72,7 +101,9 @@ export default function TimeSlotPicker({
                         <div className="absolute top-1 right-1">
                             {isSelected ? (
                                 <CheckCircle2 size={10} className="text-white" />
-                            ) : !slot.isAvailable ? (
+                            ) : isPast ? (
+                                <Clock size={10} className="text-zinc-300" />
+                            ) : isOccupied ? (
                                 <XCircle size={10} className="text-rose-400" />
                             ) : (
                                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
@@ -80,7 +111,7 @@ export default function TimeSlotPicker({
                         </div>
 
                         <span className={`text-[8px] font-bold uppercase tracking-widest mt-0.5 opacity-60 ${isSelected ? 'text-white/80' : ''}`}>
-                            {slot.isAvailable ? 'Libre' : 'Ocupado'}
+                            {isPast ? 'Pasado' : isOccupied ? 'Ocupado' : 'Libre'}
                         </span>
                     </button>
                 );

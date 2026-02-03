@@ -12,6 +12,7 @@ interface PremiumDatePickerProps {
     placeholder?: string;
     required?: boolean;
     className?: string;
+    minDate?: Date;
 }
 
 export default function PremiumDatePicker({
@@ -20,7 +21,8 @@ export default function PremiumDatePicker({
     label,
     placeholder = 'Seleccionar fecha...',
     required = false,
-    className = ''
+    className = '',
+    minDate
 }: PremiumDatePickerProps) {
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -84,6 +86,7 @@ export default function PremiumDatePicker({
             >
                 <PremiumCalendar
                     value={selectedDate}
+                    minDate={minDate}
                     onChange={handleDateChange}
                     onClose={() => setIsOpen(false)}
                     className="!border-none !shadow-none !bg-transparent !p-0 !max-w-none"

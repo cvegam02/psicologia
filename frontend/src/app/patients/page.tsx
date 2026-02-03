@@ -23,7 +23,7 @@ export default function PatientsPage() {
                     <div className="flex items-center gap-2 text-[var(--bronze)] text-[10px] font-bold uppercase tracking-[0.3em] mb-3">
                         <Sparkles size={12} /> Gestión de Expedientes
                     </div>
-                    <h1 className="text-4xl lg:text-5xl font-semibold text-[var(--espresso)] serif tracking-tight">
+                    <h1 className="text-4xl lg:text-5xl font-bold text-[var(--espresso)] serif tracking-tight">
                         Catálogo de <span className="text-[var(--bronze)] italic">Pacientes</span>
                     </h1>
                     <p className="mt-4 text-[var(--muted)] font-light max-w-xl leading-relaxed">

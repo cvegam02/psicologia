@@ -17,11 +17,13 @@ interface SessionClosingModalProps {
 export default function SessionClosingModal({ appointment, onClose, onNextAppointment, onSuccess }: SessionClosingModalProps) {
     const [notes, setNotes] = useState('');
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const [step, setStep] = useState<'notes' | 'next_prompt'>('notes');
 
     const handleSaveNotesAndAttend = async () => {
         setLoading(true);
         try {
+            setError(null);
             // 1. Update appointment to 'attended'
             await agendaApi.updateStatus(appointment.id, 'attended');
 
@@ -31,6 +33,7 @@ export default function SessionClosingModal({ appointment, onClose, onNextAppoin
             setStep('next_prompt');
         } catch (err) {
             console.error(err);
+            setError('Error al finalizar sesión. Verifica tu conexión o permisos.');
         } finally {
             setLoading(false);
         }
@@ -50,6 +53,12 @@ export default function SessionClosingModal({ appointment, onClose, onNextAppoin
                                 <X size={20} />
                             </button>
                         </div>
+
+                        {error && (
+                            <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl text-[10px] font-bold text-rose-600 uppercase tracking-wider text-center">
+                                {error}
+                            </div>
+                        )}
 
                         <div className="space-y-2">
                             <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--muted)] ml-1 flex items-center gap-2">

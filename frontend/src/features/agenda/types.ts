@@ -22,4 +22,14 @@ export interface AppointmentCreate {
     scheduled_at: string;
     duration: number;
     notes?: string;
+    status?: AppointmentStatus;
+}
+
+export interface PsychologistSchedule {
+    id: string;
+    psychologist_id: string;
+    day_of_week: number;
+    start_time: string;
+    end_time: string;
+    is_active: boolean;
 }

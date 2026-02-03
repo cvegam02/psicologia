@@ -39,8 +39,8 @@ export default function AgendaPage() {
                     <div className="flex items-center gap-2 text-[var(--bronze)] text-[10px] font-bold uppercase tracking-[0.2em]">
                         <Calendar size={12} /> Gestión de Citas
                     </div>
-                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[var(--espresso)] tracking-tighter font-[family-name:var(--font-outfit)]">
-                        Agenda <span className="text-[var(--bronze)] clinical-serif font-normal">Profesional</span>
+                    <h1 className="text-4xl lg:text-5xl font-bold text-[var(--espresso)] serif tracking-tight">
+                        Agenda <span className="text-[var(--bronze)] italic">Profesional</span>
                     </h1>
                     <p className="text-[var(--muted)] text-sm md:text-base font-medium font-[family-name:var(--font-inter)] max-w-xl leading-relaxed opacity-80">
                         Organiza tu semana clínica. Visualiza disponibilidad y asegura el seguimiento de tus pacientes.

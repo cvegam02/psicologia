@@ -1,0 +1,10 @@
+# PsicologIA Project Rules
+
+## Frontend & Design
+- **Branding Fidelity**: Strictly use project branding colors (Bronze, Espresso, Silk, Cream).
+- **Custom UI**: Navigation and selection components (dropdowns, selectors) MUST have custom-styled options. No default `<select>` or native dropdowns without custom overlays.
+- **PWA/Mobile**: Follow Mobile Design System principles. All UI must be optimized for touch and low-latency mobile interaction.
+
+## Code Quality
+- **Component Reuse**: Scan for existing components before creating new ones. Re-utilize UI primitives from `@/components/ui`.
+- **API Consistency**: Follow the established pattern of feature-based API modules (e.g., `agendaApi`, `patientsApi`).

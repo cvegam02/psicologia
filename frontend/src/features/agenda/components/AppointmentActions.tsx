@@ -13,7 +13,8 @@ import {
     Calendar,
     ArrowRight,
     Edit,
-    Search
+    Search,
+    AlertCircle
 } from 'lucide-react';
 import { agendaApi } from '../api';
 import type { Appointment, AppointmentStatus } from '../types';
@@ -29,19 +30,27 @@ interface AppointmentActionsProps {
 export default function AppointmentActions({ appointment, onUpdate, onAttended, trigger }: AppointmentActionsProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const handleStatusChange = async (newStatus: AppointmentStatus) => {
-        setIsOpen(false);
+        setError(null);
         if (newStatus === 'attended') {
+            setIsOpen(false);
             onAttended(appointment);
             return;
         }
 
+        setLoading(true);
         try {
             await agendaApi.updateStatus(appointment.id, newStatus);
+            setIsOpen(false);
             onUpdate();
         } catch (err) {
             console.error('Error updating status:', err);
+            setError('Error al actualizar: Posible restricción de permisos');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -143,10 +152,17 @@ export default function AppointmentActions({ appointment, onUpdate, onAttended, 
                             </button>
                         </div>
 
+                        {error && (
+                            <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl flex items-center gap-2 text-[10px] font-bold text-rose-600 uppercase tracking-wider animate-pulse">
+                                <AlertCircle size={14} /> {error}
+                            </div>
+                        )}
+
                         <div className="grid gap-3">
                             {actions.map(action => (
                                 <button
                                     key={action.id}
+                                    disabled={loading}
                                     onClick={() => {
                                         if (action.id === 'edit') {
                                             setIsEditOpen(true);
@@ -155,11 +171,16 @@ export default function AppointmentActions({ appointment, onUpdate, onAttended, 
                                             handleStatusChange(action.id as AppointmentStatus);
                                         }
                                     }}
-                                    className={`flex items-center justify-between w-full p-5 rounded-2xl ${action.bg} transition-all active:scale-[0.98]`}
+                                    className={`flex items-center justify-between w-full p-5 rounded-2xl ${action.bg} transition-all active:scale-[0.98] ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
                                     <div className="flex items-center gap-4">
-                                        <div className={`w-10 h-10 rounded-xl ${action.bg} flex items-center justify-center border border-white/50 shadow-sm`}>
+                                        <div className={`w-10 h-10 rounded-xl ${action.bg} flex items-center justify-center border border-white/50 shadow-sm relative`}>
                                             <action.icon size={20} className={action.color} />
+                                            {loading && (
+                                                <div className="absolute inset-0 bg-white/20 rounded-xl flex items-center justify-center">
+                                                    <div className="w-4 h-4 border-2 border-[var(--bronze)] border-t-transparent rounded-full animate-spin" />
+                                                </div>
+                                            )}
                                         </div>
                                         <span className={`font-medium ${action.color}`}>{action.label}</span>
                                     </div>

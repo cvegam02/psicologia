@@ -13,7 +13,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
 
     return (
         <div className="flex h-screen overflow-hidden bg-[var(--background)]">
-            {/* Root Sidebar (Desktop) */}
+            {/* Sidebar (Desktop Fixed, Mobile Drawer) */}
             <Sidebar
                 isOpen={isSidebarOpen}
                 onClose={() => setIsSidebarOpen(false)}
@@ -23,7 +23,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             <div className="flex flex-col flex-1 min-w-0 overflow-hidden relative">
                 <MobileHeader onMenuClick={() => setIsSidebarOpen(true)} />
 
-                <main className="flex-1 overflow-y-auto pt-16 lg:pt-0 scrollbar-hide">
+                <main className="flex-1 overflow-y-auto pt-16 lg:pt-0 scrollbar-hide pb-0">
                     <div className="max-w-7xl mx-auto px-6 py-6 lg:px-10 lg:py-10">
                         {children}
                     </div>

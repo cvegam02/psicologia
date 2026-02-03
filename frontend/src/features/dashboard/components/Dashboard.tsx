@@ -130,9 +130,14 @@ export default function Dashboard() {
             <div className="flex flex-col gap-6">
                 <div className="flex justify-between items-start">
                     <div>
-                        <h1 className="text-2xl md:text-4xl font-bold text-[var(--espresso)] tracking-tighter font-[family-name:var(--font-outfit)]">Panel de Control</h1>
-                        <p className="text-[var(--muted)] text-xs md:text-sm mt-1 font-medium font-[family-name:var(--font-inter)]">
-                            Resumen de actividad y gestión clínica.
+                        <div className="flex items-center gap-2 text-[var(--bronze)] text-[10px] font-bold uppercase tracking-[0.3em] mb-3">
+                            Panel Administrativo
+                        </div>
+                        <h1 className="text-4xl lg:text-5xl font-bold text-[var(--espresso)] serif tracking-tight">
+                            Panel de <span className="text-[var(--bronze)] italic">Control</span>
+                        </h1>
+                        <p className="max-w-xl text-[var(--muted)] font-light leading-relaxed mt-4">
+                            Resumen de actividad y gestión clínica para tu práctica.
                         </p>
                     </div>
                     <button

@@ -49,33 +49,43 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
             {/* Sidebar Content */}
             <aside className={`
-        fixed inset-y-0 left-0 z-[70] w-64 bg-[var(--item-bg)] border-r border-[var(--glass-border)] flex flex-col
-        transition-transform duration-500 var(--ease-out-expo)
-        lg:static lg:translate-x-0
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
-                {/* Logo Section - Compacted */}
-                <div className="p-6 flex flex-col items-center border-b border-[var(--glass-border)]">
+                fixed inset-y-0 left-0 z-[70] w-72 bg-white border-r border-[var(--cream)]/30 flex flex-col
+                transition-transform duration-500 var(--ease-out-expo)
+                lg:static lg:translate-x-0
+                ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+            `}>
+                {/* Logo Section - Editorial Style */}
+                <div className="p-8 pb-10 flex flex-col items-center relative">
                     <button
                         onClick={onClose}
-                        className="lg:hidden absolute top-4 right-4 p-2 text-[var(--muted)] hover:text-[var(--espresso)]"
+                        className="lg:hidden absolute top-6 right-6 p-2 text-[var(--muted)] hover:text-[var(--espresso)] transition-colors"
                     >
-                        <X size={20} />
+                        <X size={22} />
                     </button>
 
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--bronze)] to-[#B8860B] flex items-center justify-center text-white mb-4 shadow-lg shadow-[var(--bronze)]/20 rotate-3 transition-transform hover:rotate-0 duration-500">
-                        <BrainCircuit size={28} strokeWidth={1} />
+                    <div className="relative group mb-6">
+                        <div className="absolute inset-0 bg-[var(--bronze)]/20 blur-2xl rounded-full group-hover:bg-[var(--bronze)]/30 transition-all duration-700" />
+                        <div className="w-16 h-16 rounded-[2rem] bg-gradient-to-br from-[var(--espresso)] to-[#2D241E] flex items-center justify-center text-white relative z-10 shadow-2xl transition-transform duration-700 group-hover:scale-105 group-hover:rotate-3">
+                            <BrainCircuit size={32} strokeWidth={1.2} className="text-[var(--bronze)]" />
+                        </div>
                     </div>
-                    <h1 className="text-xl font-bold text-[var(--espresso)] tracking-tighter text-center font-[family-name:var(--font-outfit)]">
-                        Ana López
-                    </h1>
-                    <p className="text-[9px] items-center uppercase tracking-[0.2em] text-[var(--bronze)] mt-1 font-bold opacity-60">
-                        Psicología Clínica
-                    </p>
+
+                    <div className="text-center space-y-1">
+                        <h1 className="text-2xl font-serif font-bold text-[var(--espresso)] tracking-normal">
+                            Ana López
+                        </h1>
+                        <div className="flex items-center justify-center gap-2">
+                            <div className="h-[1px] w-4 bg-[var(--bronze)]/30" />
+                            <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--bronze)] font-bold">
+                                Psicología
+                            </p>
+                            <div className="h-[1px] w-4 bg-[var(--bronze)]/30" />
+                        </div>
+                    </div>
                 </div>
 
-                {/* Navigation - Compacted px */}
-                <nav className="flex-1 px-4 space-y-1.5 mt-8">
+                {/* Navigation - Premium List */}
+                <nav className="flex-1 px-6 space-y-2 mt-4">
                     {navigation.map((item) => {
                         const isActive = pathname === item.href;
                         return (
@@ -84,53 +94,72 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                                 href={item.href}
                                 onClick={onClose}
                                 className={`
-                  flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group font-[family-name:var(--font-inter)]
-                  ${isActive
-                                        ? 'bg-[var(--accent-glow)] text-[var(--espresso)] shadow-sm'
-                                        : 'text-[var(--muted)] hover:text-[var(--bronze)] hover:bg-[var(--silk)]'
+                                    flex items-center gap-4 px-5 py-3.5 rounded-2xl transition-all duration-500 group relative overflow-hidden
+                                    ${isActive
+                                        ? 'bg-[var(--silk)] text-[var(--espresso)]'
+                                        : 'text-[var(--muted)] hover:text-[var(--espresso)] hover:bg-[var(--silk)]/50'
                                     }
-                `}
+                                `}
                             >
-                                <item.icon
-                                    size={18}
-                                    strokeWidth={isActive ? 2 : 1.5}
-                                    className={`transition-colors ${isActive ? 'text-[var(--bronze)]' : 'group-hover:text-[var(--bronze)]'}`}
-                                />
-                                <span className={`text-sm tracking-tight ${isActive ? 'font-bold' : 'font-medium'}`}>
+                                <div className={`
+                                    w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-500
+                                    ${isActive ? 'bg-white shadow-sm text-[var(--bronze)]' : 'bg-transparent group-hover:bg-white group-hover:shadow-sm text-[var(--muted)] group-hover:text-[var(--bronze)]'}
+                                `}>
+                                    <item.icon
+                                        size={20}
+                                        strokeWidth={isActive ? 2 : 1.5}
+                                    />
+                                </div>
+                                <span className={`text-sm tracking-tight transition-all duration-300 ${isActive ? 'font-bold' : 'font-medium group-hover:translate-x-1'}`}>
                                     {item.name}
                                 </span>
+
                                 {isActive && (
-                                    <div className="ml-auto w-1 h-1 rounded-full bg-[var(--bronze)]" />
+                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[var(--bronze)] rounded-r-full" />
                                 )}
                             </Link>
                         );
                     })}
                 </nav>
 
-                {/* Footer - Compacted */}
-                <div className="p-4 mt-auto space-y-1.5 border-t border-[var(--glass-border)]">
+                {/* Footer - Professional Profile Section */}
+                <div className="p-6 pb-8 mt-auto space-y-3 border-t border-[var(--cream)]/20 bg-[var(--silk)]/30">
                     {loading ? (
-                        <div className="h-10 w-full bg-[var(--silk)] animate-pulse rounded-xl" />
-                    ) : isOwner && (
-                        <Link
-                            href="/settings"
-                            onClick={onClose}
-                            className={`flex items-center gap-3 px-4 py-2.5 w-full rounded-xl transition-all text-xs font-semibold font-[family-name:var(--font-inter)] ${pathname === '/settings'
-                                ? 'bg-[var(--accent-glow)] text-[var(--espresso)] shadow-sm'
-                                : 'text-[var(--muted)] hover:text-[var(--bronze)] hover:bg-[var(--silk)]'
-                                }`}
-                        >
-                            <Settings size={16} strokeWidth={1.5} className={pathname === '/settings' ? 'text-[var(--bronze)]' : ''} />
-                            Configuración
-                        </Link>
+                        <div className="h-12 w-full bg-[var(--cream)]/20 animate-pulse rounded-2xl" />
+                    ) : (
+                        <div className="mb-4 px-2 flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-[var(--espresso)] text-white flex items-center justify-center font-bold text-sm shadow-lg shadow-[var(--espresso)]/10">
+                                AL
+                            </div>
+                            <div className="flex flex-col min-w-0">
+                                <span className="text-[11px] font-bold text-[var(--espresso)] truncate">Dra. Ana López</span>
+                                <span className="text-[9px] text-[var(--muted)] uppercase tracking-wider font-bold">Administrador</span>
+                            </div>
+                        </div>
                     )}
-                    <button
-                        onClick={handleLogout}
-                        className="flex items-center gap-3 px-4 py-2.5 w-full text-rose-500/80 hover:bg-rose-50 rounded-xl transition-all text-xs font-semibold font-[family-name:var(--font-inter)]"
-                    >
-                        <LogOut size={16} strokeWidth={1.5} />
-                        Cerrar Sesión
-                    </button>
+
+                    <div className="grid grid-cols-2 gap-2">
+                        {isOwner && (
+                            <Link
+                                href="/settings"
+                                onClick={onClose}
+                                className={`flex items-center justify-center gap-2 h-11 rounded-xl transition-all border text-[10px] font-bold uppercase tracking-widest ${pathname === '/settings'
+                                        ? 'bg-[var(--silk)] text-[var(--espresso)] border-[var(--bronze)]/50 shadow-inner'
+                                        : 'bg-white text-[var(--muted)] border-[var(--cream)]/50 hover:border-[var(--bronze)]/50 hover:text-[var(--espresso)]'
+                                    }`}
+                                title="Configuración"
+                            >
+                                <Settings size={14} />
+                            </Link>
+                        )}
+                        <button
+                            onClick={handleLogout}
+                            className="flex items-center justify-center gap-2 h-11 rounded-xl transition-all border border-rose-100 bg-rose-50/30 text-rose-500 hover:bg-rose-50 text-[10px] font-bold uppercase tracking-widest"
+                            title="Cerrar Sesión"
+                        >
+                            <LogOut size={14} />
+                        </button>
+                    </div>
                 </div>
             </aside>
         </>

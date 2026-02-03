@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-reac
 
 interface PremiumCalendarProps {
     value?: Date;
+    minDate?: Date;
     onChange: (date: Date) => void;
     onClose?: () => void;
     className?: string;
@@ -17,8 +18,10 @@ const MONTHS = [
 
 const WEEKDAYS = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'];
 
-export default function PremiumCalendar({ value, onChange, onClose, className = '' }: PremiumCalendarProps) {
+export default function PremiumCalendar({ value, minDate, onChange, onClose, className = '' }: PremiumCalendarProps) {
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     const [currentViewDate, setCurrentViewDate] = useState(value || today);
 
     const year = currentViewDate.getFullYear();
@@ -65,6 +68,14 @@ export default function PremiumCalendar({ value, onChange, onClose, className = 
 
     const handleDateSelect = (d: number, m: number, y: number) => {
         const selected = new Date(y, m, d);
+
+        if (minDate) {
+            const normalizedSelected = new Date(y, m, d);
+            const normalizedMinDate = new Date(minDate);
+            normalizedMinDate.setHours(0, 0, 0, 0);
+            if (normalizedSelected < normalizedMinDate) return;
+        }
+
         onChange(selected);
         if (onClose) onClose();
     };
@@ -75,7 +86,19 @@ export default function PremiumCalendar({ value, onChange, onClose, className = 
     };
 
     const isToday = (d: number, m: number, y: number) => {
-        return today.getDate() === d && today.getMonth() === m && today.getFullYear() === y;
+        const now = new Date();
+        return now.getDate() === d && now.getMonth() === m && now.getFullYear() === y;
+    };
+
+    const isDisabled = (d: number, m: number, y: number) => {
+        if (!minDate) return false;
+
+        // Normalize checkDate and minDate to midnight local time for fair comparison
+        const checkDate = new Date(y, m, d);
+        const normalizedMinDate = new Date(minDate);
+        normalizedMinDate.setHours(0, 0, 0, 0);
+
+        return checkDate < normalizedMinDate;
     };
 
     return (
@@ -118,17 +141,20 @@ export default function PremiumCalendar({ value, onChange, onClose, className = 
                 {allDays.map((dateObj, idx) => {
                     const selected = isSelected(dateObj.day, dateObj.month, dateObj.year);
                     const current = isToday(dateObj.day, dateObj.month, dateObj.year);
+                    const disabled = isDisabled(dateObj.day, dateObj.month, dateObj.year);
 
                     return (
                         <button
                             key={idx}
+                            disabled={disabled}
                             onClick={() => handleDateSelect(dateObj.day, dateObj.month, dateObj.year)}
                             className={`
                                 relative h-10 w-full flex items-center justify-center rounded-xl text-xs font-semibold transition-all
                                 ${!dateObj.isCurrentMonth ? 'text-[var(--muted)]/30' : 'text-[var(--espresso)]'}
+                                ${disabled ? 'opacity-20 cursor-not-allowed' : ''}
                                 ${selected
                                     ? 'bg-[var(--bronze)] text-white shadow-lg shadow-[var(--bronze)]/20 scale-105 z-10'
-                                    : 'hover:bg-[var(--silk)]'
+                                    : !disabled ? 'hover:bg-[var(--silk)]' : ''
                                 }
                                 ${current && !selected ? 'text-[var(--bronze)] ring-1 ring-[var(--bronze)]/30' : ''}
                             `}

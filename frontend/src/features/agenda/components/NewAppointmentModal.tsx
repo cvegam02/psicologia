@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Calendar as CalendarIcon, Clock, User, AlertCircle } from 'lucide-react';
 import { usePatients } from '@/features/patients/hooks/usePatients';
+import { useUserRole } from '@/features/auth/hooks/useUserRole';
 import { agendaApi } from '../api';
 import { supabase } from '@/lib/supabase';
 import PremiumDatePicker from '@/components/ui/PremiumDatePicker';
@@ -25,6 +26,7 @@ export default function NewAppointmentModal({
     initialNotes = ''
 }: NewAppointmentModalProps) {
     const { patients } = usePatients();
+    const { user } = useUserRole();
     const [mounted, setMounted] = useState(false);
     const [selectedPatient, setSelectedPatient] = useState(initialPatientId);
 
@@ -39,7 +41,7 @@ export default function NewAppointmentModal({
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const { slots, loading: loadingAvailability } = useAvailability(date);
+    const { slots, loading: loadingAvailability } = useAvailability(date, user?.id);
 
     const patientOptions = patients.map(p => ({
         id: p.id,
@@ -54,12 +56,21 @@ export default function NewAppointmentModal({
         setLoading(true);
 
         try {
+            // Final validation for past dates/times (Using robust local components)
+            const [y, m, d] = date.split('-').map(Number);
+            const [h, min_val] = time.split(':').map(Number);
+            const scheduledAtDate = new Date(y, m - 1, d, h, min_val);
+
+            if (scheduledAtDate < new Date()) {
+                throw new Error('No se pueden agendar citas en el pasado');
+            }
+
             // Get current user ID
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error('Usuario no autenticado');
 
-            // Construct ISO date string
-            const scheduledAt = new Date(`${date}T${time}`).toISOString();
+            // Construct ISO date string (This will correctly reflect the local time as UTC)
+            const scheduledAt = scheduledAtDate.toISOString();
 
             await agendaApi.create({
                 patient_id: selectedPatient,
@@ -124,6 +135,7 @@ export default function NewAppointmentModal({
                                 }}
                                 label="Fecha de la Cita"
                                 required
+                                minDate={new Date()}
                             />
 
                             {date ? (
@@ -161,6 +173,7 @@ export default function NewAppointmentModal({
                                             selectedTime={time}
                                             onSelect={setTime}
                                             loading={loadingAvailability}
+                                            selectedDate={date}
                                         />
                                     </div>
                                 </div>

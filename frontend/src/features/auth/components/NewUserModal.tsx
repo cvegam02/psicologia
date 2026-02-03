@@ -124,7 +124,7 @@ export default function NewUserModal({ isOpen, onClose, onSuccess }: NewUserModa
                                 onChange={(e) => setRole(e.target.value as UserRole)}
                             >
                                 <option value="psychologist">Psicólogo</option>
-                                <option value="receptionist">Recepcionista</option>
+                                <option value="assistant">Asistente</option>
                                 <option value="owner">Dueño / Administrador</option>
                             </select>
                         </div>
