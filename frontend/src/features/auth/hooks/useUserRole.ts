@@ -59,6 +59,7 @@ export function useUserRole() {
                     });
                 }
             } else {
+                setRole(null);
                 setUser(null);
             }
         });
@@ -68,7 +69,7 @@ export function useUserRole() {
 
     const isOwner = role === 'owner';
     const isPsychologist = role === 'psychologist';
-    const isReceptionist = role === 'receptionist';
+    const isReceptionist = role === 'assistant';
 
     // Helper to check permissions
     const canViewClinicalNotes = isOwner || isPsychologist;

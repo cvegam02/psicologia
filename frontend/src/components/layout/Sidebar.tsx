@@ -34,8 +34,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
-        router.push('/login');
         onClose();
+        window.location.href = '/login';
     };
 
     return (
@@ -144,8 +144,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                                 href="/settings"
                                 onClick={onClose}
                                 className={`flex items-center justify-center gap-2 h-11 rounded-xl transition-all border text-[10px] font-bold uppercase tracking-widest ${pathname === '/settings'
-                                        ? 'bg-[var(--silk)] text-[var(--espresso)] border-[var(--bronze)]/50 shadow-inner'
-                                        : 'bg-white text-[var(--muted)] border-[var(--cream)]/50 hover:border-[var(--bronze)]/50 hover:text-[var(--espresso)]'
+                                    ? 'bg-[var(--silk)] text-[var(--espresso)] border-[var(--bronze)]/50 shadow-inner'
+                                    : 'bg-white text-[var(--muted)] border-[var(--cream)]/50 hover:border-[var(--bronze)]/50 hover:text-[var(--espresso)]'
                                     }`}
                                 title="Configuración"
                             >
