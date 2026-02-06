@@ -1,5 +1,6 @@
 export interface Patient {
     id: string;
+    psychologist_id: string;
     full_name: string;
     email: string | null;
     phone: string | null;

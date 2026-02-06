@@ -34,6 +34,18 @@ export const patientsApi = {
         return data;
     },
 
+    async update(id: string, updates: Partial<PatientCreate>): Promise<Patient> {
+        const { data, error } = await supabase
+            .from('patients')
+            .update(updates)
+            .eq('id', id)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data;
+    },
+
     async getNotes(patientId: string): Promise<ClinicalNote[]> {
         const { data, error } = await supabase
             .from('clinical_notes')

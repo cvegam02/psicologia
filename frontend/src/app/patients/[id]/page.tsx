@@ -17,6 +17,8 @@ import { patientsApi } from '@/features/patients/api';
 import type { Patient, ClinicalNote } from '@/features/patients/types';
 
 import { useUserRole } from '@/features/auth/hooks/useUserRole';
+import NewPatientModal from '@/features/patients/components/NewPatientModal';
+import { Edit2 } from 'lucide-react';
 
 export default function ExpedientePage() {
     const params = useParams();
@@ -29,6 +31,7 @@ export default function ExpedientePage() {
     const [loading, setLoading] = useState(true);
     const [newNote, setNewNote] = useState('');
     const [isSaving, setIsSaving] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     const fetchData = useCallback(async () => {
         if (!patientId) return;
@@ -76,29 +79,52 @@ export default function ExpedientePage() {
                     <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" /> Volver a Pacientes
                 </button>
 
-                <div className="flex flex-col md:flex-row items-center gap-10 md:gap-14">
-                    <div className="relative group">
-                        <div className="w-28 h-28 rounded-[2.5rem] bg-white border-2 border-[var(--cream)] flex items-center justify-center text-[var(--bronze)] shadow-2xl shadow-[var(--bronze)]/5 group-hover:rotate-6 transition-transform duration-500 relative z-10 overflow-hidden ring-8 ring-[var(--beige-light)]">
-                            <User size={56} strokeWidth={1} />
+                <div className="flex flex-col md:flex-row items-center justify-between gap-10">
+                    <div className="flex flex-col md:flex-row items-center gap-10 md:gap-14">
+                        <div className="relative group">
+                            <div className="w-28 h-28 rounded-[2.5rem] bg-white border-2 border-[var(--cream)] flex items-center justify-center text-[var(--bronze)] shadow-2xl shadow-[var(--bronze)]/5 group-hover:rotate-6 transition-transform duration-500 relative z-10 overflow-hidden ring-8 ring-[var(--beige-light)]">
+                                <User size={56} strokeWidth={1} />
+                            </div>
+                            <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-emerald-500 border-4 border-white z-20 shadow-sm" />
                         </div>
-                        <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-emerald-500 border-4 border-white z-20 shadow-sm" />
+
+                        <div className="text-center md:text-left space-y-3">
+                            <h1 className="text-5xl lg:text-6xl font-semibold text-[var(--espresso)] serif tracking-tight">
+                                {patient?.full_name || (loading ? '...' : 'Paciente')}
+                            </h1>
+                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
+                                <span className="px-3 py-1 rounded-full bg-[var(--bronze)]/10 text-[var(--bronze)] text-[11px] font-bold uppercase tracking-widest border border-[var(--bronze)]/10">
+                                    Sesiones: {notes.length}
+                                </span>
+                                <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-500 text-[11px] font-bold uppercase tracking-widest border border-slate-200">
+                                    Última: {notes[0] ? new Date(notes[0].created_at).toLocaleDateString() : 'N/A'}
+                                </span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="text-center md:text-left space-y-3">
-                        <h1 className="text-5xl lg:text-6xl font-semibold text-[var(--espresso)] serif tracking-tight">
-                            {patient?.full_name || (loading ? '...' : 'Paciente')}
-                        </h1>
-                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
-                            <span className="px-3 py-1 rounded-full bg-[var(--bronze)]/10 text-[var(--bronze)] text-[11px] font-bold uppercase tracking-widest border border-[var(--bronze)]/10">
-                                Sesiones: {notes.length}
-                            </span>
-                            <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-500 text-[11px] font-bold uppercase tracking-widest border border-slate-200">
-                                Última: {notes[0] ? new Date(notes[0].created_at).toLocaleDateString() : 'N/A'}
-                            </span>
-                        </div>
-                    </div>
+                    {!loading && patient && (
+                        <button
+                            onClick={() => setIsEditModalOpen(true)}
+                            className="px-6 py-3 rounded-xl border border-[var(--cream)] text-[var(--muted)] hover:bg-[var(--beige-light)] hover:text-[var(--espresso)] transition-all flex items-center gap-2 text-xs font-bold uppercase tracking-widest"
+                        >
+                            <Edit2 size={16} /> Editar Perfil
+                        </button>
+                    )}
                 </div>
             </div>
+
+            {/* Edit Modal */}
+            {isEditModalOpen && patient && (
+                <NewPatientModal
+                    onClose={() => setIsEditModalOpen(false)}
+                    onSuccess={() => {
+                        setIsEditModalOpen(false);
+                        fetchData();
+                    }}
+                    patient={patient}
+                />
+            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mt-16">
                 {/* Left: Evolution & Editor */}
