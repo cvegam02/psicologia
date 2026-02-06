@@ -1,6 +1,6 @@
 fastapi
 uvicorn
-supabase
+supabase==2.0.0
 python-dotenv
 google-generativeai
 pydantic
